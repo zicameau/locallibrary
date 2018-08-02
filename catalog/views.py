@@ -5,9 +5,16 @@ from .models import Book, Author, BookInstance, Genre
 
 class BookListView(generic.ListView):
     model = Book
+    paginate_by = 10
 
 class BookDetailView(generic.DetailView):
     model = Book
+
+class AuthorListView(generic.ListView):
+    model = Author
+
+class AuthorDetailView(generic.DetailView):
+    model = Author
 
 def index(request):
     """View function for home page of site"""
@@ -22,12 +29,17 @@ def index(request):
     # The 'all()' is implied by default.
     num_authors = Author.objects.count()
 
-    context = {
+    # Number of visits to this view, as counted in the session variable.
 
+    num_visits = requests.session.get('num_visits', 0)
+    request.session['num_visits'] = num_visits + 1
+
+    context = {
         'num_books' : num_books,
         'num_instances' : num_instances,
         'num_instances_available': num_instances_available,
         'num_authors': num_authors,
+        'num_visits': num_visits
         }
 
     # Render the HTML template index.html with the data in the context variable
